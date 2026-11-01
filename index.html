@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Centros PotencIA al Día — Vibras Positivas HM</title>
+<meta name="description" content="Seguimiento ciudadano al caso Centros PotencIA: $234.399 millones, 60 centros prometidos y ninguno funcionando. Noticias que se actualizan solas.">
+<meta name="theme-color" content="#0b0f1a">
+<meta property="og:title" content="Centros PotencIA al Día">
+<meta property="og:description" content="$234.399 millones, 60 centros prometidos, 0 funcionando. Siga el caso día a día.">
+<meta property="og:image" content="icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="#inicio" class="brand"><span class="brand-cp">CP</span><span class="brand-txt">Centros PotencIA <b>al Día</b></span></a>
+  <div class="top-actions">
+    <button id="btnRefresh" class="btn-ghost" data-i18n="refresh">Actualizar</button>
+    <button id="btnLang" class="btn-lang" aria-label="Idioma / Language"><span class="on">ES</span>|<span>EN</span></button>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <a href="#hoy" data-i18n="nav_hoy">Hoy</a>
+  <a href="#cifras" data-i18n="nav_cifras">Cifras</a>
+  <a href="#historia" data-i18n="nav_historia">La historia</a>
+  <a href="#tuetano" data-i18n="nav_tuetano">Al tuétano</a>
+  <a href="#versiones" data-i18n="nav_versiones">Versiones</a>
+  <a href="#municipios" data-i18n="nav_municipios">Municipios</a>
+  <a href="#accion" data-i18n="nav_accion">Actúe</a>
+  <a href="#fuentes" data-i18n="nav_fuentes">Fuentes</a>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<section id="inicio" class="hero">
+  <div class="hero-media" id="heroMedia"></div>
+  <div class="hero-inner">
+    <p class="kicker" data-i18n="hero_kicker">Seguimiento ciudadano · Vibras Positivas HM</p>
+    <h1><span class="big-money" data-count="234399" data-prefix="$" data-sep="." >$0</span><small data-i18n="hero_millones">millones de pesos</small></h1>
+    <p class="hero-lead" data-i18n="hero_lead">Prometieron centros de inteligencia artificial en las regiones. Se firmó el contrato, se giró la plata a una fiducia… y hoy no funciona ni uno.</p>
+    <div class="hero-stats">
+      <div class="hs"><b data-count="75">0</b><span data-i18n="hs_75">centros anunciados</span></div>
+      <div class="hs"><b data-count="60">0</b><span data-i18n="hs_60">tras el ajuste</span></div>
+      <div class="hs red"><b>0</b><span data-i18n="hs_0">funcionando</span></div>
+      <div class="hs"><b data-count="2.09" data-dec="2" data-suffix="%">0</b><span data-i18n="hs_209">avance de obra</span></div>
+    </div>
+    <div class="clocks">
+      <div class="clock"><b id="dSince">—</b><span data-i18n="clock_firma">días desde la firma del contrato (13 sep 2024)</span></div>
+      <div class="clock"><b id="dStop">—</b><span data-i18n="clock_paro">días con las obras paralizadas (desde nov 2025)</span></div>
+      <div class="clock"><b id="dDemand">—</b><span data-i18n="clock_dev">días desde que se exigió la devolución (30 oct 2026)</span></div>
+    </div>
+  </div>
+  <div class="ticker" id="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
+</section>
+
+<!-- HOY -->
+<section id="hoy" class="sec">
+  <div class="sec-head">
+    <h2 data-i18n="hoy_t">Hoy</h2>
+    <p class="today-date" id="todayDate"></p>
+  </div>
+  <div class="status-row">
+    <span class="pulse"></span>
+    <span id="statusTxt" data-i18n="status_loading">Buscando noticias en vivo…</span>
+  </div>
+  <div class="search-wrap">
+    <input id="q" type="search" placeholder="Buscar en las noticias del caso…" data-i18n-ph="search_ph" autocomplete="off">
+  </div>
+  <div class="filters" id="filters">
+    <button class="chip on" data-f="all" data-i18n="f_all">Todo</button>
+    <button class="chip" data-f="24h" data-i18n="f_24">Últimas 24 h</button>
+    <button class="chip" data-f="7d" data-i18n="f_7">Esta semana</button>
+  </div>
+  <div id="lead" class="lead-news"></div>
+  <div id="news" class="news-grid"></div>
+  <p class="note" data-i18n="news_note">Las noticias llegan solas: un robot las busca cada 30 minutos y la app hace una búsqueda en vivo cada vez que usted entra. Los titulares se muestran en su idioma original.</p>
+</section>
+
+<!-- CIFRAS -->
+<section id="cifras" class="sec sec-alt">
+  <div class="sec-head"><h2 data-i18n="cifras_t">Las cifras que hay que saberse</h2></div>
+  <div class="metric-grid" id="metrics"></div>
+
+  <div class="progress-block">
+    <h3 data-i18n="prog_t">¿Cuánto se avanzó? (corte abril 2026, Contraloría)</h3>
+    <div class="bar-row"><span data-i18n="prog_gen">Avance general del proyecto (incluye estructuración)</span><div class="bar"><i data-w="17.71"></i></div><b>17,71%</b></div>
+    <div class="bar-row"><span data-i18n="prog_obra">Avance de los contratos de obra</span><div class="bar"><i data-w="2.09" class="red"></i></div><b>2,09%</b></div>
+    <div class="bar-row"><span data-i18n="prog_func">Centros funcionando</span><div class="bar"><i data-w="0"></i></div><b>0 de 60</b></div>
+  </div>
+
+  <div class="money-split">
+    <h3 data-i18n="split_t">¿Dónde está la plata?</h3>
+    <div class="split-bar">
+      <div class="split-a" style="flex:4.056"></div>
+      <div class="split-b" style="flex:230.343"></div>
+    </div>
+    <div class="split-legend">
+      <div><i class="sw a"></i><b>$4.056 M</b> <span data-i18n="split_a">desembolsados a Findeter (asistencia técnica), según El Tiempo y MinTIC en abril de 2026</span></div>
+      <div><i class="sw b"></i><b>≈ $230.343 M</b> <span data-i18n="split_b">el resto: en la fiducia, según el Gobierno anterior y el exministro Lizcano, con rendimientos financieros. El reintegro aún no se ha confirmado públicamente.</span></div>
+    </div>
+    <p class="note" data-i18n="split_note">La diferencia es clave: el Gobierno actual dice que el 100% se giró a una fiducia; los informes de abril dicen que a Findeter solo le pagaron unos $4.056 millones. Ambas cosas pueden ser ciertas a la vez: la plata salió del Ministerio hacia la fiducia, pero casi toda sigue ahí sin gastarse. La pregunta de fondo es por qué no ha vuelto al Tesoro.</p>
+  </div>
+
+  <div class="types">
+    <h3 data-i18n="types_t">Lo que se prometió: tres tipos de centro</h3>
+    <div class="type-grid" id="types"></div>
+  </div>
+</section>
+
+<!-- HISTORIA -->
+<section id="historia" class="sec">
+  <div class="sec-head"><h2 data-i18n="hist_t">La historia, paso a paso</h2></div>
+  <ol class="timeline" id="timeline"></ol>
+</section>
+
+<!-- TUETANO -->
+<section id="tuetano" class="sec sec-dark">
+  <div class="sec-head"><h2 data-i18n="tue_t">Hasta el tuétano: las preguntas que nadie ha contestado</h2>
+  <p class="sub" data-i18n="tue_sub">Lo que dicen las fuentes, dónde se contradicen y qué falta por saber.</p></div>
+  <div class="qa" id="qa"></div>
+</section>
+
+<!-- VERSIONES -->
+<section id="versiones" class="sec">
+  <div class="sec-head"><h2 data-i18n="ver_t">Las versiones de cada lado</h2>
+  <p class="sub" data-i18n="ver_sub">Para que usted saque sus propias conclusiones.</p></div>
+  <div class="versions" id="versions"></div>
+</section>
+
+<!-- MUNICIPIOS -->
+<section id="municipios" class="sec sec-alt">
+  <div class="sec-head"><h2 data-i18n="mun_t">Municipios que esperaban su centro</h2>
+  <p class="sub" data-i18n="mun_sub">Estos son los que aparecen con nombre propio en anuncios oficiales y prensa. La lista completa de los 60 no se ha publicado de forma clara: es una de las cosas que puede pedir con un derecho de petición.</p></div>
+  <input id="qm" type="search" class="mini-search" placeholder="Buscar municipio o departamento…" data-i18n-ph="mun_ph">
+  <div class="mun-grid" id="mun"></div>
+  <div class="callout">
+    <h3 data-i18n="bc_t">¿Y nuestra región?</h3>
+    <p data-i18n="bc_p">En Córdoba, la Gobernación y MinTIC anunciaron tres centros: Ciénaga de Oro, Buenavista y Tierralta, por $10.000 millones ($9.000 de MinTIC y $1.000 de la Gobernación). No encontramos anuncios públicos de centros en los municipios del Bajo Cauca antioqueño (Caucasia, El Bagre, Cáceres, Nechí, Tarazá, Zaragoza). Si usted sabe de alguno, escríbanos.</p>
+  </div>
+</section>
+
+<!-- ACCION -->
+<section id="accion" class="sec">
+  <div class="sec-head"><h2 data-i18n="acc_t">Actúe: pregunte usted mismo</h2>
+  <p class="sub" data-i18n="acc_sub">Cualquier ciudadano puede pedir información al Estado. Este derecho de petición está listo para copiar, llenar con sus datos y radicar en la ventanilla virtual de MinTIC.</p></div>
+  <div class="petition">
+    <div class="pet-fields">
+      <input id="pName" placeholder="Su nombre completo" data-i18n-ph="p_name">
+      <input id="pId" placeholder="Cédula" data-i18n-ph="p_id">
+      <input id="pCity" placeholder="Ciudad o municipio" data-i18n-ph="p_city">
+      <input id="pMail" placeholder="Correo para la respuesta" data-i18n-ph="p_mail">
+    </div>
+    <pre id="petText" class="pet-text"></pre>
+    <div class="pet-actions">
+      <button id="btnCopy" class="btn" data-i18n="p_copy">Copiar la carta</button>
+      <a id="btnWa" class="btn btn-alt" target="_blank" rel="noopener" data-i18n="p_share">Compartir la app por WhatsApp</a>
+    </div>
+    <p class="note" data-i18n="p_note">Base legal: artículo 23 de la Constitución y Ley 1755 de 2015. La entidad tiene, por regla general, 15 días hábiles para responder; las solicitudes de documentos e información, 10 días hábiles.</p>
+  </div>
+</section>
+
+<!-- FUENTES -->
+<section id="fuentes" class="sec sec-alt">
+  <div class="sec-head"><h2 data-i18n="src_t">Fuentes</h2></div>
+  <ul class="sources" id="sources"></ul>
+  <p class="note" data-i18n="src_note">Esta app es un ejercicio ciudadano independiente. No pertenece al Gobierno ni a ningún partido. Si encuentra un error, avísenos y lo corregimos.</p>
+</section>
+
+</main>
+
+<footer class="foot">
+  <p><b>Vibras Positivas HM</b> · <span data-i18n="foot">Apps ciudadanas para seguirle la pista a la plata pública</span></p>
+  <p class="foot-small"><span data-i18n="foot_upd">Datos del caso revisados el</span> <span id="caseDate">1 nov 2026</span> · <span data-i18n="foot_news">Noticias actualizadas</span>: <span id="newsUpd">—</span></p>
+</footer>
+
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
