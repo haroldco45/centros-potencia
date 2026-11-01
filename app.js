@@ -20,7 +20,12 @@ const UI = {
   vid_empty:{es:'El robot está buscando videos y fotos. Vuelva en unos minutos.',en:'The robot is looking for videos and photos. Check back in a few minutes.'},
   p_send:{es:'Enviar a MinTIC por correo',en:'Send to MinTIC by email'}, p_gmail:{es:'Enviar con Gmail',en:'Send with Gmail'},
   p_to:{es:'Se envía a',en:'Goes to'}, p_to2:{es:'(correo oficial de PQRSD de MinTIC), con copia a su correo.',en:'(MinTIC\'s official petitions inbox), with a copy to your email.'},
-  p_need:{es:'Escriba su nombre y cédula para enviar la carta.',en:'Enter your name and ID number to send the letter.'},
+  p_need:{es:'Ojo: la carta va sin su nombre o cédula. Complételos en el correo antes de enviar.',en:'Heads up: the letter is missing your name or ID. Add them in the email before sending.'},
+  mh_t:{es:'¿No se abrió su correo?',en:'Email app didn\'t open?'},
+  mh_p:{es:'Algunos navegadores (por ejemplo, el de Instagram, Facebook o WhatsApp) no dejan abrir el correo. Ábrala en Chrome o Safari, o copie estos tres datos y péguelos en un correo nuevo:',en:'Some in-app browsers (Instagram, Facebook, WhatsApp) block email links. Open the app in Chrome or Safari, or copy these three items into a new email:'},
+  mh_to:{es:'1. Copiar el correo de MinTIC',en:'1. Copy MinTIC\'s address'}, mh_su:{es:'2. Copiar el asunto',en:'2. Copy the subject'}, mh_bd:{es:'3. Copiar la carta',en:'3. Copy the letter'},
+  mh_ok:{es:'Copiado',en:'Copied'},
+  inapp:{es:'Está viendo la app dentro de otra aplicación. Para que el correo se abra solo, toque los tres puntos y elija "Abrir en el navegador".',en:'You are viewing this inside another app. For email to open automatically, tap the three dots and choose "Open in browser".'},
   nav_accion:{es:'Actúe',en:'Take action'}, nav_fuentes:{es:'Fuentes',en:'Sources'},
   hero_kicker:{es:'Seguimiento ciudadano · Vibras Positivas HM',en:'Citizen watch · Vibras Positivas HM'},
   hero_millones:{es:'millones de pesos',en:'million Colombian pesos'},
@@ -449,21 +454,27 @@ Atentamente,
 
 ${v('#pName') || '[Nombre completo]'}
 C. C. ${v('#pId') || '[número]'}`;
+  if (typeof mailLinks === 'function' && $('#btnMail')) mailLinks();
 }
 
 
 const MINTIC_MAIL = 'minticresponde@mintic.gov.co';
 const MAIL_SUBJECT = 'Derecho de petición de información - Centros PotencIA - Contrato 1872 de 2024';
-function sendMail(gmail) {
-  if (!$('#pName').value.trim() || !$('#pId').value.trim()) { toast(UI.p_need[LANG]); $('#pName').focus(); return false; }
+function mailLinks() {
   const body = $('#petText').textContent, cc = $('#pMail').value.trim();
-  if (gmail) {
-    const u = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + MINTIC_MAIL + (cc ? '&cc=' + encodeURIComponent(cc) : '') + '&su=' + encodeURIComponent(MAIL_SUBJECT) + '&body=' + encodeURIComponent(body);
-    window.open(u, '_blank', 'noopener');
-  } else {
-    location.href = 'mailto:' + MINTIC_MAIL + '?' + (cc ? 'cc=' + encodeURIComponent(cc) + '&' : '') + 'subject=' + encodeURIComponent(MAIL_SUBJECT) + '&body=' + encodeURIComponent(body);
-  }
-  return true;
+  const su = encodeURIComponent(MAIL_SUBJECT), bd = encodeURIComponent(body);
+  $('#btnMail').href = 'mailto:' + MINTIC_MAIL + '?' + (cc ? 'cc=' + encodeURIComponent(cc) + '&' : '') + 'subject=' + su + '&body=' + bd;
+  $('#btnGmail').href = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + MINTIC_MAIL + (cc ? '&cc=' + encodeURIComponent(cc) : '') + '&su=' + su + '&body=' + bd;
+}
+const IN_APP = /Instagram|FBAN|FBAV|FB_IAB|Line\/|TikTok|musical_ly|Snapchat|WhatsApp/i.test(navigator.userAgent);
+async function copyTxt(txt, msg) {
+  try { await navigator.clipboard.writeText(txt); }
+  catch (e) { const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  toast(msg);
+}
+function afterSend() {
+  if (!$('#pName').value.trim() || !$('#pId').value.trim()) toast(UI.p_need[LANG]);
+  setTimeout(() => { $('#mailHelp').hidden = false; }, 1200);
 }
 
 /* ---------- Hero media (optional real photo/video in /media) ---------- */
@@ -503,8 +514,11 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#qm').oninput = renderMun;
   $$('#filters .chip').forEach(c => c.onclick = () => { $$('#filters .chip').forEach(x => x.classList.remove('on')); c.classList.add('on'); FILTER = c.dataset.f; renderNews(); });
   ['#pName', '#pId', '#pCity', '#pMail'].forEach(id => $(id).oninput = renderPetition);
-  $('#btnMail').onclick = e => { e.preventDefault(); sendMail(false); };
-  $('#btnGmail').onclick = e => { e.preventDefault(); sendMail(true); };
+  $('#btnMail').onclick = afterSend; $('#btnGmail').onclick = afterSend;
+  $('#cpTo').onclick = () => copyTxt(MINTIC_MAIL, UI.mh_ok[LANG] + ': ' + MINTIC_MAIL);
+  $('#cpSu').onclick = () => copyTxt(MAIL_SUBJECT, UI.mh_ok[LANG]);
+  $('#cpBd').onclick = () => copyTxt($('#petText').textContent, UI.mh_ok[LANG]);
+  if (IN_APP) { $('#inApp').hidden = false; $('#mailHelp').hidden = false; }
   $('#btnCopy').onclick = async () => { try { await navigator.clipboard.writeText($('#petText').textContent); } catch (e) { const r = document.createRange(); r.selectNode($('#petText')); getSelection().removeAllRanges(); getSelection().addRange(r); document.execCommand('copy'); } toast(UI.copied[LANG]); };
   $('#btnWa').href = 'https://wa.me/?text=' + encodeURIComponent('Centros PotencIA: $234.399 millones, 60 centros prometidos y ninguno funcionando. Siga el caso día a día: https://centros-potencia.netlify.app');
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { renderToday(); refreshAll(false); } });

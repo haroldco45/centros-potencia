@@ -173,10 +173,20 @@
     <p class="pet-to"><span data-i18n="p_to">Se envía a</span> <b>minticresponde@mintic.gov.co</b> <span data-i18n="p_to2">(correo oficial de PQRSD de MinTIC), con copia a su correo.</span></p>
     <pre id="petText" class="pet-text"></pre>
     <div class="pet-actions">
-      <a id="btnMail" class="btn btn-big" data-i18n="p_send">Enviar a MinTIC por correo</a>
-      <a id="btnGmail" class="btn btn-alt" target="_blank" rel="noopener" data-i18n="p_gmail">Enviar con Gmail</a>
+      <a id="btnMail" href="mailto:minticresponde@mintic.gov.co" class="btn btn-big" data-i18n="p_send">Enviar a MinTIC por correo</a>
+      <a id="btnGmail" href="https://mail.google.com/mail/?view=cm&fs=1&to=minticresponde@mintic.gov.co" class="btn btn-alt" target="_blank" rel="noopener" data-i18n="p_gmail">Enviar con Gmail</a>
       <button id="btnCopy" class="btn btn-ghost2" data-i18n="p_copy">Copiar la carta</button>
       <a id="btnWa" class="btn btn-alt" target="_blank" rel="noopener" data-i18n="p_share">Compartir la app por WhatsApp</a>
+    </div>
+    <p id="inApp" class="inapp" data-i18n="inapp" hidden></p>
+    <div id="mailHelp" class="mail-help" hidden>
+      <h4 data-i18n="mh_t">¿No se abrió su correo?</h4>
+      <p data-i18n="mh_p"></p>
+      <div class="mh-btns">
+        <button id="cpTo" class="btn btn-ghost2" data-i18n="mh_to">1. Copiar el correo de MinTIC</button>
+        <button id="cpSu" class="btn btn-ghost2" data-i18n="mh_su">2. Copiar el asunto</button>
+        <button id="cpBd" class="btn btn-ghost2" data-i18n="mh_bd">3. Copiar la carta</button>
+      </div>
     </div>
     <p class="note" data-i18n="p_note">Base legal: artículo 23 de la Constitución y Ley 1755 de 2015. La entidad tiene, por regla general, 15 días hábiles para responder; las solicitudes de documentos e información, 10 días hábiles.</p>
   </div>

@@ -228,3 +228,8 @@ h3{font-size:18px;margin-bottom:12px}
 @keyframes glow{50%{box-shadow:0 8px 40px rgba(255,210,63,.6)}}
 .btn-ghost2{background:transparent;border:1px solid var(--line);color:var(--tx)}
 @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}.btn-big{width:100%;text-align:center}}
+
+.inapp{margin-top:14px;padding:12px 14px;border-radius:12px;background:rgba(255,77,94,.12);border:1px solid rgba(255,77,94,.4);font-size:14px}
+.mail-help{margin-top:14px;padding:16px;border-radius:14px;background:#0c1220;border:1px dashed var(--acc)}
+.mail-help h4{color:var(--acc);margin-bottom:6px}.mail-help p{font-size:14px;color:#cfd8e7}
+.mh-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
