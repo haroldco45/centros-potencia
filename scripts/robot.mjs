@@ -75,3 +75,35 @@ const now = new Date();
 const out = { updated: now.toISOString(), items };
 await writeFile(FILE, JSON.stringify(out, null, 1) + '\n');
 console.log(`Listo: ${items.length} noticias · ${fresh} nuevas · ${imgs} fotos nuevas · ${now.toLocaleString('es-CO', { timeZone: 'America/Bogota' })} (hora Colombia)`);
+
+// ---------- Videos reales de YouTube ----------
+const VFILE = 'data/videos.json';
+const VQUERIES = ['Centros PotencIA', 'Centros Potencia MinTIC', 'Centros PotencIA Findeter'];
+const vold = JSON.parse(await readFile(VFILE, 'utf8').catch(() => '{"items":[]}'));
+const vmap = new Map(vold.items.map(v => [v.id, v]));
+for (const q of VQUERIES) {
+  const r = await get('https://www.youtube.com/results?search_query=' + encodeURIComponent(q) + '&sp=CAI%253D&hl=es&gl=CO');
+  if (!r) { console.log('youtube falló:', q); continue; }
+  const m = r.text.match(/var ytInitialData = (\{[\s\S]*?\});<\/script>/);
+  if (!m) continue;
+  let data; try { data = JSON.parse(m[1]); } catch { continue; }
+  const found = [];
+  (function walk(o) {
+    if (!o || typeof o !== 'object') return;
+    if (o.videoRenderer && o.videoRenderer.videoId) found.push(o.videoRenderer);
+    for (const k in o) walk(o[k]);
+  })(data);
+  for (const v of found) {
+    const title = (v.title?.runs || []).map(x => x.text).join('');
+    if (!RELEVANT.test(title)) continue;
+    if (!vmap.has(v.videoId)) vmap.set(v.videoId, {
+      id: v.videoId, title,
+      channel: (v.ownerText?.runs || [])[0]?.text || '',
+      when: v.publishedTimeText?.simpleText || '',
+      found: now.toISOString()
+    });
+  }
+}
+const videos = [...vmap.values()].sort((a, b) => Date.parse(b.found) - Date.parse(a.found)).slice(0, 24);
+await writeFile(VFILE, JSON.stringify({ updated: now.toISOString(), items: videos }, null, 1) + '\n');
+console.log(`Videos: ${videos.length}`);

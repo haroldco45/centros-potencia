@@ -13,6 +13,14 @@ const UI = {
   refresh:{es:'Actualizar',en:'Refresh'},
   nav_hoy:{es:'Hoy',en:'Today'}, nav_cifras:{es:'Cifras',en:'Numbers'}, nav_historia:{es:'La historia',en:'Timeline'},
   nav_tuetano:{es:'Al tuétano',en:'Deep dive'}, nav_versiones:{es:'Versiones',en:'Each side'}, nav_municipios:{es:'Municipios',en:'Towns'},
+  nav_videos:{es:'Videos',en:'Videos'},
+  vid_t:{es:'En video y en fotos',en:'On video and in photos'},
+  vid_sub:{es:'Videos reales de YouTube y fotos de las noticias del caso. El robot los busca solo y los va cambiando.',en:'Real YouTube videos and photos from the case news. The robot finds them on its own and keeps them fresh.'},
+  gal_t:{es:'Las fotos del caso',en:'Photos from the case'},
+  vid_empty:{es:'El robot está buscando videos y fotos. Vuelva en unos minutos.',en:'The robot is looking for videos and photos. Check back in a few minutes.'},
+  p_send:{es:'Enviar a MinTIC por correo',en:'Send to MinTIC by email'}, p_gmail:{es:'Enviar con Gmail',en:'Send with Gmail'},
+  p_to:{es:'Se envía a',en:'Goes to'}, p_to2:{es:'(correo oficial de PQRSD de MinTIC), con copia a su correo.',en:'(MinTIC\'s official petitions inbox), with a copy to your email.'},
+  p_need:{es:'Escriba su nombre y cédula para enviar la carta.',en:'Enter your name and ID number to send the letter.'},
   nav_accion:{es:'Actúe',en:'Take action'}, nav_fuentes:{es:'Fuentes',en:'Sources'},
   hero_kicker:{es:'Seguimiento ciudadano · Vibras Positivas HM',en:'Citizen watch · Vibras Positivas HM'},
   hero_millones:{es:'millones de pesos',en:'million Colombian pesos'},
@@ -53,8 +61,8 @@ const UI = {
   bc_p:{es:'En Córdoba, la Gobernación y MinTIC anunciaron tres centros: Ciénaga de Oro, Buenavista y Tierralta, por $10.000 millones ($9.000 de MinTIC y $1.000 de la Gobernación). No encontramos anuncios públicos de centros en los municipios del Bajo Cauca antioqueño (Caucasia, El Bagre, Cáceres, Nechí, Tarazá, Zaragoza). Si usted sabe de alguno, escríbanos.',
         en:'In Córdoba, the governor\'s office and MinTIC announced three centers: Ciénaga de Oro, Buenavista and Tierralta, for COP 10,000 million (9,000 from MinTIC, 1,000 from the department). We found no public announcements of centers in Antioquia\'s Bajo Cauca towns (Caucasia, El Bagre, Cáceres, Nechí, Tarazá, Zaragoza). If you know of one, write to us.'},
   acc_t:{es:'Actúe: pregunte usted mismo',en:'Take action: ask for yourself'},
-  acc_sub:{es:'Cualquier ciudadano puede pedir información al Estado. Este derecho de petición está listo para copiar, llenar con sus datos y radicar en la ventanilla virtual de MinTIC.',
-           en:'Any citizen can request information from the State. This petition (derecho de petición) is ready to copy, fill in and file through MinTIC\'s online service desk. It is written in Spanish because it must be filed in Spanish.'},
+  acc_sub:{es:'Cualquier ciudadano puede pedir información al Estado. Llene sus datos y toque "Enviar": se abre su correo con la carta lista, dirigida a MinTIC. Solo le queda darle enviar.',
+           en:'Any citizen can request information from the State. Fill in your details and tap "Send": your email opens with the letter ready, addressed to MinTIC. Just hit send. The letter is in Spanish because it must be filed in Spanish.'},
   p_name:{es:'Su nombre completo',en:'Your full name'}, p_id:{es:'Cédula',en:'ID number (cédula)'},
   p_city:{es:'Ciudad o municipio',en:'City or town'}, p_mail:{es:'Correo para la respuesta',en:'Email for the reply'},
   p_copy:{es:'Copiar la carta',en:'Copy the letter'}, p_share:{es:'Compartir la app por WhatsApp',en:'Share the app on WhatsApp'},
@@ -361,6 +369,7 @@ function renderNews() {
   const limg = L.image ? `<div class="ln-img" style="background-image:url('${esc(L.image)}')"></div>` : `<div class="ln-img typo"><span>${esc(L.source)}</span></div>`;
   $('#lead').innerHTML = `<a class="ln" href="${esc(L.url)}" target="_blank" rel="noopener">${limg}<div class="ln-body"><span class="badge">${UI.latest[LANG]}</span><h3>${esc(L.title)}</h3><span class="meta"><b>${esc(L.source)}</b> · ${L.ts ? fmtDate(new Date(L.ts)) + ' · ' + ago(L.ts) : ''}</span></div></a>`;
   $('#news').innerHTML = list.slice(1, 31).map(card).join('');
+  if (typeof renderMedia === 'function' && FILTER === 'all' && !q) renderMedia();
   $('#newsUpd').textContent = ROBOT_UPDATED ? fmtDate(new Date(ROBOT_UPDATED)) + ' ' + fmtTime(new Date(ROBOT_UPDATED)) : '—';
 }
 
@@ -375,6 +384,37 @@ async function refreshAll(manual) {
   b.classList.remove('spin'); b.textContent = UI.refresh[LANG];
   const items = [...TICKER.map(x => t(x)), ...NEWS.slice(0, 5).map(n => n.title)];
   const html = items.map(x => `<span><b>/</b>${esc(x)}</span>`).join(''); $('#tickerTrack').innerHTML = html + html;
+}
+
+/* ---------- Videos, fotos y portada ---------- */
+let VIDEOS = [];
+async function loadVideos() {
+  try { const r = await fetch('data/videos.json?v=' + Date.now(), {cache: 'no-store'}); VIDEOS = (await r.json()).items || []; } catch (e) {}
+  renderMedia();
+}
+function playVideo(id) {
+  const v = VIDEOS.find(x => x.id === id) || VIDEOS[0]; if (!v) return;
+  $('#vidMain').innerHTML = `<div class="vid-frame"><iframe src="https://www.youtube-nocookie.com/embed/${esc(v.id)}?rel=0" title="${esc(v.title)}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div><p class="vid-cap"><b>${esc(v.title)}</b><span>${esc(v.channel)}${v.when ? ' · ' + esc(v.when) : ''}</span></p>`;
+}
+function renderMedia() {
+  const photos = NEWS.filter(n => n.image).slice(0, 12);
+  $('#vidEmpty').hidden = VIDEOS.length > 0 || photos.length > 0;
+  if (VIDEOS.length) {
+    if (!$('#vidMain').innerHTML) playVideo(VIDEOS[0].id);
+    $('#vidList').innerHTML = VIDEOS.slice(0, 12).map(v => `<button class="vth" data-v="${esc(v.id)}"><span class="vth-img" style="background-image:url('https://i.ytimg.com/vi/${esc(v.id)}/hqdefault.jpg')"><i class="play"></i></span><span class="vth-t">${esc(v.title)}</span><span class="vth-c">${esc(v.channel)}</span></button>`).join('');
+    $$('.vth').forEach(b => b.onclick = () => { playVideo(b.dataset.v); $('#vidMain').scrollIntoView({behavior: 'smooth', block: 'center'}); });
+  }
+  $('#gallery').innerHTML = photos.map((n, i) => `<a class="ph${i === 0 ? ' ph-big' : ''}" href="${esc(n.url)}" target="_blank" rel="noopener" style="background-image:url('${esc(n.image)}')"><span>${esc(n.source)}</span></a>`).join('');
+  heroSlides(photos);
+}
+let slideTimer = null, slidesKey = '';
+function heroSlides(photos) {
+  const box = $('#heroMedia');
+  if (box.dataset.own === '1' || !photos.length) return;
+  const key = photos.map(p => p.image).join('|'); if (key === slidesKey) return; slidesKey = key;
+  box.innerHTML = photos.slice(0, 6).map((p, i) => `<div class="slide${i === 0 ? ' on' : ''}" style="background-image:url('${esc(p.image)}')"></div>`).join('');
+  clearInterval(slideTimer); let k = 0;
+  slideTimer = setInterval(() => { const s = box.querySelectorAll('.slide'); if (s.length < 2) return; s[k].classList.remove('on'); k = (k + 1) % s.length; s[k].classList.add('on'); }, 5000);
 }
 
 /* ---------- Petition ---------- */
@@ -411,12 +451,27 @@ ${v('#pName') || '[Nombre completo]'}
 C. C. ${v('#pId') || '[número]'}`;
 }
 
+
+const MINTIC_MAIL = 'minticresponde@mintic.gov.co';
+const MAIL_SUBJECT = 'Derecho de petición de información - Centros PotencIA - Contrato 1872 de 2024';
+function sendMail(gmail) {
+  if (!$('#pName').value.trim() || !$('#pId').value.trim()) { toast(UI.p_need[LANG]); $('#pName').focus(); return false; }
+  const body = $('#petText').textContent, cc = $('#pMail').value.trim();
+  if (gmail) {
+    const u = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + MINTIC_MAIL + (cc ? '&cc=' + encodeURIComponent(cc) : '') + '&su=' + encodeURIComponent(MAIL_SUBJECT) + '&body=' + encodeURIComponent(body);
+    window.open(u, '_blank', 'noopener');
+  } else {
+    location.href = 'mailto:' + MINTIC_MAIL + '?' + (cc ? 'cc=' + encodeURIComponent(cc) + '&' : '') + 'subject=' + encodeURIComponent(MAIL_SUBJECT) + '&body=' + encodeURIComponent(body);
+  }
+  return true;
+}
+
 /* ---------- Hero media (optional real photo/video in /media) ---------- */
 function loadHeroMedia() {
   const box = $('#heroMedia');
   fetch('media/hero.mp4', {method: 'HEAD'}).then(r => {
-    if (r.ok) { box.innerHTML = '<video autoplay muted loop playsinline src="media/hero.mp4"></video>'; return; }
-    const im = new Image(); im.onload = () => { box.innerHTML = ''; box.appendChild(im); }; im.alt = ''; im.src = 'media/hero.jpg';
+    if (r.ok) { box.dataset.own = '1'; box.innerHTML = '<video autoplay muted loop playsinline src="media/hero.mp4"></video>'; return; }
+    const im = new Image(); im.onload = () => { box.dataset.own = '1'; clearInterval(slideTimer); box.innerHTML = ''; box.appendChild(im); }; im.alt = ''; im.src = 'media/hero.jpg';
   }).catch(() => {});
 }
 
@@ -441,13 +496,15 @@ document.addEventListener('DOMContentLoaded', () => {
   applyLang();
   $$('[data-count]').forEach(countUp);
   loadHeroMedia(); tabsSpy();
-  refreshAll(false);
-  $('#btnRefresh').onclick = () => refreshAll(true);
+  refreshAll(false); loadVideos();
+  $('#btnRefresh').onclick = () => { refreshAll(true); loadVideos(); };
   $('#btnLang').onclick = () => { LANG = LANG === 'es' ? 'en' : 'es'; try { localStorage.setItem('cp_lang', LANG); } catch (e) {} applyLang(); $$('[data-count]').forEach(countUp); };
   $('#q').oninput = renderNews;
   $('#qm').oninput = renderMun;
   $$('#filters .chip').forEach(c => c.onclick = () => { $$('#filters .chip').forEach(x => x.classList.remove('on')); c.classList.add('on'); FILTER = c.dataset.f; renderNews(); });
   ['#pName', '#pId', '#pCity', '#pMail'].forEach(id => $(id).oninput = renderPetition);
+  $('#btnMail').onclick = e => { e.preventDefault(); sendMail(false); };
+  $('#btnGmail').onclick = e => { e.preventDefault(); sendMail(true); };
   $('#btnCopy').onclick = async () => { try { await navigator.clipboard.writeText($('#petText').textContent); } catch (e) { const r = document.createRange(); r.selectNode($('#petText')); getSelection().removeAllRanges(); getSelection().addRange(r); document.execCommand('copy'); } toast(UI.copied[LANG]); };
   $('#btnWa').href = 'https://wa.me/?text=' + encodeURIComponent('Centros PotencIA: $234.399 millones, 60 centros prometidos y ninguno funcionando. Siga el caso día a día: https://centros-potencia.netlify.app');
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { renderToday(); refreshAll(false); } });
