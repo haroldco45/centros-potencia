@@ -3,7 +3,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 
 const FILE = 'data/noticias.json';
-const RELEVANT = /potencia/i;
+const RELEVANT = { test: s => /PotencIA/.test(s) || (/centros?\s+(de\s+)?potencia/i.test(s) && /mintic|ministerio|\btic\b|findeter|inteligencia artificial|contralor|lizcano|falla|constru|municipio/i.test(s)) };
 const FEEDS = [
   'https://news.google.com/rss/search?q=%22Centros+PotencIA%22&hl=es-419&gl=CO&ceid=CO:es-419',
   'https://news.google.com/rss/search?q=%22Centros+Potencia%22+MinTIC+Findeter&hl=es-419&gl=CO&ceid=CO:es-419',
@@ -69,7 +69,7 @@ for (const f of FEEDS) {
 // Fotos reales: busca og:image para las noticias que aún no tienen
 const items = [...map.values()].sort((a, b) => Date.parse(b.date || 0) - Date.parse(a.date || 0)).slice(0, 80);
 let imgs = 0;
-for (const n of items.filter(n => !n.image).slice(0, 20)) { const im = await ogImage(n.url); if (im) { n.image = im; imgs++; } }
+for (const n of items.filter(n => !n.image && !/news\.google\.com/.test(n.url)).slice(0, 40)) { const im = await ogImage(n.url); if (im) { n.image = im; imgs++; } }
 
 const now = new Date();
 const out = { updated: now.toISOString(), items };

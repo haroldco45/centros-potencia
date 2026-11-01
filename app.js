@@ -288,7 +288,7 @@ function renderToday() {
 let NEWS = [], FILTER = 'all', ROBOT_UPDATED = null;
 const esc = s => String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
-const RELEVANT = /potencia/i;
+const RELEVANT = { test: s => /PotencIA/.test(s) || (/centros?\s+(de\s+)?potencia/i.test(s) && /mintic|ministerio|\btic\b|findeter|inteligencia artificial|contralor|lizcano|falla|constru|municipio/i.test(s)) };
 
 function mergeNews(list) {
   const seen = new Map(NEWS.map(n => [norm(n.title).slice(0, 70), n]));
